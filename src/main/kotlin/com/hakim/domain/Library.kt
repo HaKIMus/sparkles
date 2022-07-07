@@ -4,8 +4,8 @@ import com.hakim.domain.event.*
 import java.util.UUID
 
 data class Library(
-    val id: UUID,
-) {
+    val id: AggregateId,
+) : Aggregate(id) {
     val readers: MutableList<Reader> = mutableListOf()
     val books: MutableList<Book> = mutableListOf()
 
@@ -34,7 +34,7 @@ data class Library(
 
         books.remove(borrowedBook)
 
-        val event = BookBorrowed(id)
+        val event = BookBorrowed(this.id, borrowedBook.id)
         diffEvents.add(event)
 
         return this

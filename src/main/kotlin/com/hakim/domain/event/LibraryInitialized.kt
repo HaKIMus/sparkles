@@ -1,6 +1,7 @@
 package com.hakim.domain.event
 
+import com.hakim.domain.AggregateId
 import java.util.UUID
 
-class LibraryInitialized(id: UUID) : DomainEvent(id) {
+class LibraryInitialized(libraryId: AggregateId) : DomainEvent(libraryId) {
 }
