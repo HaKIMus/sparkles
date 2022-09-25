@@ -1,18 +1,15 @@
 package com.hakim.domain
 
 import com.hakim.domain.event.*
-import java.util.UUID
 
-data class Library(
-    val id: AggregateId,
-) : Aggregate(id) {
+data class Library(val id: AggregateId) : Aggregate(id) {
     val readers: MutableList<Reader> = mutableListOf()
     val books: MutableList<Book> = mutableListOf()
 
-    private val diffEvents: MutableList<DomainEvent> = mutableListOf()
+    val changes: MutableList<DomainEvent> = mutableListOf()
 
     init {
-        diffEvents.add(LibraryInitialized(id))
+        changes.add(LibraryInitialized(id))
     }
 
     fun apply(event: ReaderRegistered) {
@@ -35,7 +32,7 @@ data class Library(
         books.remove(borrowedBook)
 
         val event = BookBorrowed(this.id, borrowedBook.id)
-        diffEvents.add(event)
+        changes.add(event)
 
         return this
     }

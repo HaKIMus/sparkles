@@ -5,7 +5,7 @@ import com.hakim.domain.event.*
 
 class LibraryReconstruction : AggregateReconstruction<Library> {
     override fun reconstruct(events: List<DomainEvent>): Library {
-        val sortedEvents = events.sortedBy { it.createdAt }.toMutableList()
+        val sortedEvents = events.sortedBy { it.occurredOn }.toMutableList()
 
         if (sortedEvents.first() !is LibraryInitialized) {
             throw Exception("No init event") // TODO: domain exception
