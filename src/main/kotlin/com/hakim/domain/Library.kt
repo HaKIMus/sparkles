@@ -12,16 +12,13 @@ data class Library(val id: AggregateId) : Aggregate(id) {
         changes.add(LibraryInitialized(id))
     }
 
-    fun apply(event: ReaderRegistered) {
-        readers.add(event.transform())
-    }
+    fun registerBook(book: Book): Library {
+        books.add(book)
 
-    fun apply(event: BookRegistered) {
-        books.add(event.transform())
-    }
+        val event = BookRegistered(this.id, book.id)
+        changes.add(event)
 
-    fun apply(event: BookBorrowed) {
-        books.remove(books.first { it.id == event.bookId } )
+        return this
     }
 
     fun borrowBook(borrowedBook: Book): Library {
@@ -35,5 +32,21 @@ data class Library(val id: AggregateId) : Aggregate(id) {
         changes.add(event)
 
         return this
+    }
+
+    fun hasChanged(): Boolean {
+        return changes.isNotEmpty()
+    }
+
+    fun apply(event: BookRegistered) {
+        books.add(event.transform())
+    }
+
+    fun apply(event: BookBorrowed) {
+        books.remove(books.first { it.id == event.bookId } )
+    }
+
+    fun apply(event: ReaderRegistered) {
+        readers.add(event.transform())
     }
 }

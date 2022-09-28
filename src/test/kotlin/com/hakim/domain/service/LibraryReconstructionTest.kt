@@ -5,7 +5,7 @@ import com.hakim.domain.event.BookRegistered
 import com.hakim.domain.event.DomainEvent
 import com.hakim.domain.event.LibraryInitialized
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import java.util.*
 
 class LibraryReconstructionTest {
     @Test

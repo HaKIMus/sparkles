@@ -38,6 +38,7 @@ class LibraryTest {
         assert(library.books.isNotEmpty())
         library.borrowBook(library.books.first())
         assert(library.books.isEmpty())
+        assert(library.hasChanged())
     }
 
     @Test
