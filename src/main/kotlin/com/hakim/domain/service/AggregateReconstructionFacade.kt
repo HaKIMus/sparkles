@@ -4,11 +4,11 @@ import com.hakim.domain.Aggregate
 import com.hakim.domain.AggregateId
 import com.hakim.infrastructure.eventstore.EventStore
 
-class AggregateReconstructionFacade(
+class AggregateReconstructionFacade<T : Aggregate>(
     private val eventStore: EventStore,
-    private val aggregateReconstruction: LibraryReconstruction
+    private val aggregateReconstruction: AggregateReconstruction<T>,
 ) {
-    suspend fun <T : Aggregate> reconstruct(aggregateId: AggregateId) : T {
-        return aggregateReconstruction.reconstruct(eventStore.read(aggregateId)) as T
+    suspend fun reconstruct(aggregateId: AggregateId) : T {
+        return aggregateReconstruction.reconstruct(eventStore.read(aggregateId))
     }
 }
