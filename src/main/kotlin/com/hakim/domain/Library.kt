@@ -42,16 +42,13 @@ data class Library(val id: AggregateId) : Aggregate(id) {
 
     fun apply(event: BookRegistered) {
         books.add(event.transform())
-        changes.add(event)
     }
 
     fun apply(event: BookBorrowed) {
         books.remove(books.first { it.id == event.bookId } )
-        changes.add(event)
     }
 
     fun apply(event: ReaderRegistered) {
         readers.add(event.transform())
-        changes.add(event)
     }
 }
