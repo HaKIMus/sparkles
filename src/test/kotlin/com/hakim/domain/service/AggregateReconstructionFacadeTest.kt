@@ -20,7 +20,7 @@ class AggregateReconstructionFacadeTest {
             LibraryReconstruction(),
         )
 
-        val reconstructedLibrary = facade.reconstruct<Library>(aggregateId)
+        val reconstructedLibrary = facade.reconstruct(aggregateId)
         assert(reconstructedLibrary.id == aggregateId)
     }
 }

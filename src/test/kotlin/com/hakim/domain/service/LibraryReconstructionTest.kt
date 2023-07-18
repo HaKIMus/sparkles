@@ -5,6 +5,7 @@ import com.hakim.domain.event.BookRegistered
 import com.hakim.domain.event.DomainEvent
 import com.hakim.domain.event.LibraryInitialized
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.util.*
 
 class LibraryReconstructionTest {
@@ -26,7 +27,7 @@ class LibraryReconstructionTest {
     fun `reconstruct from unsorted events`() {
         val reconstruction = LibraryReconstruction()
         val aggregateId = AggregateId.random()
-        val initEvent = LibraryInitialized(aggregateId)
+        val initEvent = LibraryInitialized(aggregateId, occurredOn = Date.from(Instant.now().minusMillis(1)))
 
         val events = mutableListOf<DomainEvent>(
             BookRegistered(aggregateId, UUID.randomUUID()),

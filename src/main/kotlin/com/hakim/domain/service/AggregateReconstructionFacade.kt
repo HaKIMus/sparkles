@@ -9,6 +9,6 @@ class AggregateReconstructionFacade<T : Aggregate>(
     private val aggregateReconstruction: AggregateReconstruction<T>,
 ) {
     suspend fun reconstruct(aggregateId: AggregateId) : T {
-        return aggregateReconstruction.reconstruct(eventStore.read(aggregateId))
+        return aggregateReconstruction.reconstructAsync(eventStore.read(aggregateId))
     }
 }

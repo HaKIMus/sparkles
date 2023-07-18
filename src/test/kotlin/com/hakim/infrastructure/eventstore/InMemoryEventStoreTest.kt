@@ -2,9 +2,9 @@ package com.hakim.infrastructure.eventstore
 
 import com.hakim.domain.AggregateId
 import com.hakim.domain.event.LibraryInitialized
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class InMemoryEventStoreTest {
     @Test
@@ -15,7 +15,7 @@ class InMemoryEventStoreTest {
         val eventStore = InMemoryEventStore()
         eventStore.persist(event)
 
-        assert(eventStore.read(aggregateId).isNotEmpty())
+        assert(eventStore.read(aggregateId).toList().isNotEmpty())
     }
 
     @Test
@@ -27,6 +27,6 @@ class InMemoryEventStoreTest {
         eventStore.persist(event)
 
         val readEvents = eventStore.read(aggregateId)
-        assert(readEvents.first().aggregateId == aggregateId)
+        assert(readEvents.toList().first().aggregateId == aggregateId)
     }
 }

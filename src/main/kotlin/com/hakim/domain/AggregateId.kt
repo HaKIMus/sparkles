@@ -1,8 +1,11 @@
 package com.hakim.domain
 
-import java.util.UUID
+import com.hakim.infrastructure.serialization.AggregateIdSerializer
+import kotlinx.serialization.Serializable
+import java.util.*
 
-data class AggregateId(private val id: UUID) {
+@Serializable(with = AggregateIdSerializer::class)
+data class AggregateId(val id: UUID) {
     companion object {
         fun random(): AggregateId {
             return AggregateId(UUID.randomUUID())

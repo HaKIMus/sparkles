@@ -1,6 +1,9 @@
 package com.hakim.domain
 
-import java.util.UUID
+import com.hakim.infrastructure.serialization.UuidSerializer
+import kotlinx.serialization.Serializable
+import java.util.*
 
-data class Book(val id: UUID) {
+@Serializable
+data class Book(@Serializable(with = UuidSerializer::class) val id: UUID) {
 }
