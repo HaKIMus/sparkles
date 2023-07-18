@@ -1,7 +1,6 @@
 package com.hakim.ui
 
 import com.hakim.domain.AggregateId
-import com.hakim.domain.event.BookBorrowed
 import com.hakim.domain.event.BookRegistered
 import com.hakim.domain.event.LibraryInitialized
 import com.hakim.domain.service.LibraryReconstruction
@@ -26,8 +25,8 @@ class HomeController(
         eventStore.persist(LibraryInitialized(aggregateId))
         val bookId = UUID.randomUUID()
         eventStore.persist(BookRegistered(aggregateId, bookId))
-        eventStore.persist(BookBorrowed(aggregateId, bookId))
+        //eventStore.persist(BookBorrowed(aggregateId, bookId))
 
-        return json.encodeToString(libraryReconstruction.reconstructAsync(eventStore.read(aggregateId)))
+        return json.encodeToString(libraryReconstruction.reconstructAsync(eventStore.read(aggregateId)).await())
     }
 }

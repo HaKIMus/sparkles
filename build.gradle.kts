@@ -28,7 +28,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
 
-    implementation("org.litote.kmongo:kmongo:4.8.0")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
     implementation("org.litote.kmongo:kmongo-id-serialization:4.1.3")
     implementation("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
 
