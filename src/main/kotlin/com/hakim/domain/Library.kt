@@ -2,53 +2,67 @@ package com.hakim.domain
 
 import com.hakim.domain.event.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
-data class Library(val id: AggregateId) : Aggregate(id) {
-    val readers: MutableList<Reader> = mutableListOf()
-    val books: MutableList<Book> = mutableListOf()
+data class Library private constructor(val id: AggregateId) : Aggregate(id) {
+    @Transient private val _readers: MutableList<Reader> = mutableListOf()
+    val readers = _readers.toList()
 
-    val changes: MutableList<DomainEvent> = mutableListOf()
+    @Transient private val _books: MutableList<Book> = mutableListOf()
+    val books = _books.toList()
 
-    init {
-        changes.add(LibraryInitialized(id))
+    @Transient private val _changes: MutableList<DomainEvent> = mutableListOf()
+    val changes = _changes.toList()
+
+    companion object {
+        fun newLibrary(aggregateId: AggregateId): Library {
+            val library = Library(aggregateId)
+            library._changes.add(LibraryInitialized(aggregateId))
+
+            return library
+        }
+
+        fun libraryFromLibraryInitialized(event: LibraryInitialized): Library {
+            return Library(event.aggregateId)
+        }
     }
 
     fun registerBook(book: Book): Library {
-        books.add(book)
+        _books.add(book)
 
         val event = BookRegistered(this.id, book.id)
-        changes.add(event)
+        _changes.add(event)
 
         return this
     }
 
     fun borrowBook(borrowedBook: Book): Library {
-        if (books.firstOrNull { it == borrowedBook } == null) {
+        if (_books.firstOrNull { it == borrowedBook } == null) {
             TODO("throw a domain exception")
         }
 
-        books.remove(borrowedBook)
+        _books.remove(borrowedBook)
 
         val event = BookBorrowed(this.id, borrowedBook.id)
-        changes.add(event)
+        _changes.add(event)
 
         return this
     }
 
     fun hasChanged(): Boolean {
-        return changes.isNotEmpty()
+        return _changes.isNotEmpty()
     }
 
     fun apply(event: BookRegistered) {
-        books.add(event.transform())
+        _books.add(event.transform())
     }
 
     fun apply(event: BookBorrowed) {
-        books.remove(books.first { it.id == event.bookId } )
+        _books.remove(_books.first { it.id == event.bookId } )
     }
 
     fun apply(event: ReaderRegistered) {
-        readers.add(event.transform())
+        _readers.add(event.transform())
     }
 }

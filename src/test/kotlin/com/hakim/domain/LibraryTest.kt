@@ -8,7 +8,7 @@ import java.util.*
 class LibraryTest {
     @Test
     fun `create new clean instance`() {
-        val library = Library(AggregateId.random())
+        val library = Library.newLibrary(AggregateId.random())
 
         assert(library.books.isEmpty())
         assert(library.readers.isEmpty())
@@ -16,7 +16,7 @@ class LibraryTest {
 
     @Test
     fun `apply book registered event test`() {
-        val library = Library(AggregateId.random())
+        val library = Library.newLibrary(AggregateId.random())
 
         val newBookId = UUID.randomUUID();
         library.apply(BookRegistered(library.id, newBookId))
@@ -27,7 +27,7 @@ class LibraryTest {
 
     @Test
     fun `apply book borrowed event test`() {
-        val library = Library(AggregateId.random())
+        val library = Library.newLibrary(AggregateId.random())
 
         val newBookId = UUID.randomUUID();
         library.apply(BookRegistered(library.id, newBookId))
@@ -43,7 +43,7 @@ class LibraryTest {
 
     @Test
     fun `borrow book from library test`() {
-        val library = Library(AggregateId.random())
+        val library = Library.newLibrary(AggregateId.random())
 
         val newBookId = UUID.randomUUID()
         library.apply(BookRegistered(library.id, newBookId))

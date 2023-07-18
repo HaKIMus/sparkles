@@ -12,6 +12,6 @@ class RegisterBookCommandHandler(
     override suspend fun handle(command: RegisterBookCommand) {
         val library = aggregateReconstruction.reconstruct(command.libraryId)
         library.registerBook(command.book)
-        eventStore.persist(library.changes)
+        eventStore.persist(library._changes)
     }
 }

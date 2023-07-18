@@ -60,6 +60,6 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
     private fun createLibraryFromFirstEvent(first: DomainEvent): Library {
         if (first !is LibraryInitialized) throw Exception()
 
-        return Library(first.aggregateId)
+        return Library.libraryFromLibraryInitialized(first)
     }
 }

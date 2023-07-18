@@ -10,7 +10,7 @@ class AggregateReconstructionFacadeTest {
     @Test
     fun `reconstruct`() = runBlocking {
         val aggregateId = AggregateId.random()
-        val library = Library(aggregateId)
+        val library = Library.newLibrary(aggregateId)
 
         val eventStore = InMemoryEventStore()
         eventStore.persist(library.changes)
