@@ -34,6 +34,11 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
 }
 
 
