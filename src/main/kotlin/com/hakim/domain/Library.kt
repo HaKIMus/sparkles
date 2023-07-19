@@ -1,15 +1,27 @@
 package com.hakim.domain
 
 import com.hakim.domain.event.*
+import kotlinx.serialization.Serializable
 
-data class Library(val id: AggregateId) : Aggregate(id) {
+@Serializable
+data class Library private constructor(val id: AggregateId) : Aggregate(id) {
     val readers: MutableList<Reader> = mutableListOf()
+
     val books: MutableList<Book> = mutableListOf()
 
     val changes: MutableList<DomainEvent> = mutableListOf()
 
-    init {
-        changes.add(LibraryInitialized(id))
+    companion object {
+        fun newLibrary(aggregateId: AggregateId): Library {
+            val library = Library(aggregateId)
+            library.changes.add(LibraryInitialized(aggregateId))
+
+            return library
+        }
+
+        fun libraryFromInitializedEvent(event: LibraryInitialized): Library {
+            return Library(event.aggregateId)
+        }
     }
 
     fun registerBook(book: Book): Library {

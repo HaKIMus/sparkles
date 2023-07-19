@@ -2,7 +2,13 @@ package com.hakim.domain.service
 
 import com.hakim.domain.Library
 import com.hakim.domain.event.*
+import jakarta.inject.Singleton
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 
+@Singleton
 class LibraryReconstruction : AggregateReconstruction<Library> {
     override fun reconstruct(events: List<DomainEvent>): Library {
         val sortedEvents = events.sortedBy { it.occurredOn }.toMutableList()
@@ -18,6 +24,34 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
         }
 
         return library
+    }
+
+    override suspend fun reconstructAsync(events: Flow<DomainEvent>): Deferred<Library> = coroutineScope {
+        var library: Library? = null
+
+        events.collect { event ->
+            when (event) {
+                is LibraryInitialized -> {
+                    if (library == null) {
+                        library = createLibraryFromFirstEvent(event)
+                    } else {
+                        throw Exception("Multiple init events") // TODO: domain exception
+                    }
+                }
+                else -> {
+                    if (library != null) {
+                        mapEventToLibrary(library!!, event)
+                    } else {
+                        throw Exception("No init event") // TODO: domain exception
+                    }
+                }
+            }
+        }
+
+
+        return@coroutineScope async {
+            library ?: throw IllegalStateException("No library was created")
+        }
     }
 
     private fun mapEventToLibrary(library: Library, event: DomainEvent) {
@@ -40,6 +74,6 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
     private fun createLibraryFromFirstEvent(first: DomainEvent): Library {
         if (first !is LibraryInitialized) throw Exception()
 
-        return Library(first.aggregateId)
+        return Library.libraryFromInitializedEvent(first)
     }
 }
