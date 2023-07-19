@@ -57,7 +57,8 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
 
         return@coroutineScope async {
             library ?: throw IllegalStateException("No library was created")
-        }    }
+        }
+    }
 
     private fun mapEventToLibrary(library: Library, event: DomainEvent) {
         when(event) {
@@ -79,6 +80,6 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
     private fun createLibraryFromFirstEvent(first: DomainEvent): Library {
         if (first !is LibraryInitialized) throw Exception()
 
-        return Library.libraryFromLibraryInitialized(first)
+        return Library.libraryFromInitializedEvent(first)
     }
 }

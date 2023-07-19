@@ -19,7 +19,7 @@ data class Library private constructor(val id: AggregateId) : Aggregate(id) {
             return library
         }
 
-        fun libraryFromLibraryInitialized(event: LibraryInitialized): Library {
+        fun libraryFromInitializedEvent(event: LibraryInitialized): Library {
             return Library(event.aggregateId)
         }
     }
