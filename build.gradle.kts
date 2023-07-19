@@ -5,6 +5,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("io.micronaut.application") version "3.4.1"
     kotlin("plugin.serialization") version "1.6.21"
+    jacoco
 }
 
 version = "0.1"
@@ -41,6 +42,17 @@ application {
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+tasks.test {
+    finalizedBy("jacocoTestReport")
+}
+
+tasks.withType<JacocoReport> {
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = true
+    }
 }
 
 tasks {

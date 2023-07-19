@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew build
 
       - name: Test with Gradle
-        run: ./gradlew test
+        run: ./gradlew test jacocoTestReport
 
       - name: Archive test results
         if: failure()
@@ -44,3 +44,11 @@ jobs:
           name: test-results
           path: |
             **/build/reports/tests
+
+      - name: Archive coverage results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-results
+          path: |
+            **/build/reports/jacoco
