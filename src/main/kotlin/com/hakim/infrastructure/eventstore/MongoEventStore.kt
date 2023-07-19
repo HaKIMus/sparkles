@@ -4,9 +4,9 @@ import com.hakim.domain.AggregateId
 import com.hakim.domain.event.DomainEvent
 import com.hakim.infrastructure.storage.MongoClient
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import org.litote.kmongo.eq
@@ -14,7 +14,7 @@ import org.litote.kmongo.eq
 @Singleton
 class MongoEventStore(
     @Inject private val client: MongoClient,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher
 ) : EventStore {
     private val collection = client.database.getCollection<DomainEvent>()
 

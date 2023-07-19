@@ -7,7 +7,6 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 
 @Singleton
 class LibraryReconstruction : AggregateReconstruction<Library> {
@@ -29,11 +28,6 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
 
     override suspend fun reconstructAsync(events: Flow<DomainEvent>): Deferred<Library> = coroutineScope {
         var library: Library? = null
-
-        val x = events.toList()
-        x.forEach {
-            println(it.occurredOn)
-        }
 
         events.collect { event ->
             when (event) {
