@@ -1,0 +1,15 @@
+micronaut:
+  application:
+    name: sparkles
+
+kafka:
+  bootstrap:
+    servers: localhost:9092
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+mongodb:
+  uri: mongodb://localhost:27017/sparkles
