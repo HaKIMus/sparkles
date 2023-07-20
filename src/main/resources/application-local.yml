@@ -4,7 +4,7 @@ micronaut:
 
 kafka:
   bootstrap:
-    servers: kafka:9092
+    servers: localhost:9092
 
 netty:
   default:
@@ -12,4 +12,4 @@ netty:
       max-order: 3
 
 mongodb:
-  uri: mongodb://mongodb:27017/sparkles
+  uri: mongodb://localhost:27017/sparkles
