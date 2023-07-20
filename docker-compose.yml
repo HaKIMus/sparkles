@@ -23,10 +23,35 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
-      - 9092:9092
+      - "9092:9092"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - "10095:8080"
+    environment:
+        KAFKA_CLUSTERS_0_NAME: local
+        KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+
+  sparkles-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - kafka
+      - mongodb
+    environment:
+      - MICRONAUT_ENVIRONMENTS=docker
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${PWD}/build/libs/sparkles-0.1-all.jar:/app/sparkles-app.jar
 
 volumes:
   dbsparkles:

@@ -14,5 +14,9 @@ data class AggregateId(val id: UUID) {
         fun fromUuid(uuid: UUID): AggregateId {
             return AggregateId(uuid)
         }
+
+        fun fromString(aggregateId: String): AggregateId {
+            return AggregateId(UUID.fromString(aggregateId))
+        }
     }
 }
