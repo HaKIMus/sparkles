@@ -8,6 +8,8 @@ import jakarta.inject.Named
 import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.litote.kmongo.eq
 
@@ -31,5 +33,20 @@ class MongoEventStore(
             .find(DomainEvent::aggregateId eq aggregateId)
             .ascendingSort(DomainEvent::occurredOn)
             .toFlow()
+    }
+
+    override suspend fun readAll(): Flow<Flow<DomainEvent>> = withContext(dispatcher) {
+        val events = collection
+            .find()
+            .ascendingSort(DomainEvent::occurredOn)
+            .toList()
+
+        val groupedEvents = events.groupBy { it.aggregateId }
+
+        return@withContext flow {
+            groupedEvents.forEach { (_, events) ->
+                emit(events.asFlow())
+            }
+        }
     }
 }

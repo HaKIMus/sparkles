@@ -8,4 +8,5 @@ interface EventStore {
     suspend fun persist(event: DomainEvent)
     suspend fun persist(events: List<DomainEvent>)
     suspend fun read(aggregateId: AggregateId): Flow<DomainEvent>
+    suspend fun readAll(): Flow<Flow<DomainEvent>>
 }
