@@ -11,12 +11,11 @@ import kotlin.time.Duration.Companion.seconds
 @Singleton
 class LibraryCacheReadEventStoreProxy(
     private val eventStore: EventStore,
-    private val reconstruction: LibraryReconstruction
-) : ReadEventStoreProxy<Library> {
-    private val cache = Cache.Builder()
+    private val reconstruction: LibraryReconstruction,
+    private val cache: Cache<AggregateId, Library> = Cache.Builder()
         .expireAfterAccess(60.seconds)
-        .build<AggregateId, Library>()
-
+        .build()
+) : ReadEventStoreProxy<Library> {
     override suspend fun read(aggregateId: AggregateId): Library {
         val library = cache.get(aggregateId) {
             reconstruction.reconstructAsync(eventStore.read(aggregateId)).await()
