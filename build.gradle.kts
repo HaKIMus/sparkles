@@ -23,17 +23,19 @@ dependencies {
     implementation("io.micronaut.kafka:micronaut-kafka")
     implementation("io.micronaut.kotlin:micronaut-kotlin-extension-functions")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
+    implementation("io.micronaut:micronaut-validation")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
     runtimeOnly("ch.qos.logback:logback-classic")
-    implementation("io.micronaut:micronaut-validation")
 
     implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
     implementation("org.litote.kmongo:kmongo-id-serialization:4.1.3")
     implementation("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
 
     testImplementation("org.testcontainers:kafka:1.18.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")

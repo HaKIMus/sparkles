@@ -22,4 +22,8 @@ class InMemoryEventStore : EventStore {
     override suspend fun read(aggregateId: AggregateId): Flow<DomainEvent> {
         return events[aggregateId]?.toList()?.asFlow() ?: flowOf()
     }
+
+    override suspend fun readAll(): Flow<Flow<DomainEvent>> {
+        return events.values.map { it.asFlow() }.asFlow()
+    }
 }
