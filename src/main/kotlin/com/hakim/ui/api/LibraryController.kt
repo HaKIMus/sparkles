@@ -16,7 +16,7 @@ class LibraryController(
     }
 
     @Get("/v1/libraries/{libraryId}")
-    suspend fun listLibraries(libraryId: String): Library {
+    suspend fun findLibrary(libraryId: String): Library {
         return libraryEventStore.read(AggregateId.fromString(libraryId))
     }
 }
