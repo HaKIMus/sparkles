@@ -6,30 +6,35 @@ import com.hakim.domain.service.LibraryReconstruction
 import com.hakim.infrastructure.eventstore.EventStore
 import io.github.reactivecircus.cache4k.Cache
 import jakarta.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
+import java.time.Duration
+import java.time.Instant
 
 @Singleton
 class LibraryCacheReadEventStoreProxy(
     private val eventStore: EventStore,
     private val reconstruction: LibraryReconstruction,
-    private val cache: Cache<AggregateId, Library> = Cache.Builder()
-        .expireAfterAccess(60.seconds)
-        .build()
+    private val cache: Cache<AggregateId, Library>
 ) : ReadEventStoreProxy<Library> {
+    private var lastReadAllTime: Instant = Instant.MIN
+
     override suspend fun read(aggregateId: AggregateId): Library {
-        val library = cache.get(aggregateId) {
+        return cache.get(aggregateId) {
             reconstruction.reconstructAsync(eventStore.read(aggregateId)).await()
         }
-
-        return library
     }
 
     override suspend fun readAll(): List<Library> {
-        if (cache.asMap().isEmpty()) {
+        val now = Instant.now()
+
+        if (Duration.between(lastReadAllTime, now).toMinutes() >= 1) {
+            cache.invalidateAll()
+
             eventStore.readAll().collect {
                 val library = reconstruction.reconstructAsync(it).await()
                 cache.put(library.id, library)
             }
+
+            lastReadAllTime = now
         }
 
         return cache.asMap().values.toList()
