@@ -1,8 +1,9 @@
-package com.hakim.infrastructure.eventstore.proxy
+package com.hakim.infrastructure.eventstore.service
 
 import com.hakim.domain.AggregateId
 import com.hakim.domain.Library
 import com.hakim.domain.service.LibraryReconstruction
+import com.hakim.infrastructure.eventstore.CachedEventStoreQualifier
 import com.hakim.infrastructure.eventstore.EventStore
 import io.github.reactivecircus.cache4k.Cache
 import jakarta.inject.Singleton
@@ -10,20 +11,20 @@ import java.time.Duration
 import java.time.Instant
 
 @Singleton
-class LibraryCacheReadEventStoreProxy(
-    private val eventStore: EventStore,
+class LibraryCacheReconstructAggregate(
+    @CachedEventStoreQualifier private val eventStore: EventStore,
     private val reconstruction: LibraryReconstruction,
     private val cache: Cache<AggregateId, Library>
-) : ReadEventStoreProxy<Library> {
+) : ReconstructAggregate<Library> {
     private var lastReadAllTime: Instant = Instant.MIN
 
-    override suspend fun read(aggregateId: AggregateId): Library {
+    override suspend fun reconstruct(aggregateId: AggregateId): Library {
         return cache.get(aggregateId) {
             reconstruction.reconstructAsync(eventStore.read(aggregateId)).await()
         }
     }
 
-    override suspend fun readAll(): List<Library> {
+    override suspend fun reconstructAll(): List<Library> {
         val now = Instant.now()
 
         if (Duration.between(lastReadAllTime, now).toMinutes() >= 1) {
