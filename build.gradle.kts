@@ -5,7 +5,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("io.micronaut.application") version "3.4.1"
     kotlin("plugin.serialization") version "1.6.21"
-    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.7.2"
 }
 
 version = "0.1"
@@ -52,15 +52,17 @@ java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
 
-tasks.test {
-    finalizedBy("jacocoTestReport")
+koverReport {
+    filters {
+        includes {
+            classes("com.hakim.*")
+        }
+    }
 }
 
-tasks.withType<JacocoReport> {
-    reports {
-        xml.isEnabled = true
-        html.isEnabled = true
-    }
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.koverVerify)
 }
 
 tasks {

@@ -1,9 +1,11 @@
 name: Kotlin CI
 
 on:
+  workflow_dispatch:
+  pull_request:
   push:
     branches:
-      - '**'
+      - 'master'
 
 jobs:
   build:
@@ -55,3 +57,22 @@ jobs:
           name: coverage-results
           path: |
             **/build/reports/jacoco
+
+      - name: Create coverage-data directory and copy contents
+        run: |
+          mkdir -p JVM/intellij-coverage-agent/gradle/.qodana/code-coverage
+          cp -R JVM/intellij-coverage-agent/gradle/build/kover/bin-reports/* JVM/intellij-coverage-agent/gradle/.qodana/code-coverage/
+
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v2
+        with:
+          name: gradle-coverage-data.zip
+          path: JVM/intellij-coverage-agent/gradle/.qodana/code-coverage
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_GRADLE }}
+        with:
+          args: "-i,JVM/intellij-coverage-agent/gradle,--linter,jetbrains/qodana-jvm:2023.2-eap"
+          pr-mode: false
