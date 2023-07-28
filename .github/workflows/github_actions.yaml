@@ -60,10 +60,7 @@ jobs:
           path: |
             **/build/reports/jacoco
 
-      - name: Qodana Cloud Code Inspection
+      - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@main
-        with:
-          token: ${{ secrets.QODANA_TOKEN }}
-          project: ${{ github.repository }}
-          linters: 'kotlin'
-          branch: ${{ github.ref_name }}
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
