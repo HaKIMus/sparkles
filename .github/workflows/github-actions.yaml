@@ -1,10 +1,6 @@
 name: Kotlin CI
 
 on:
-  workflow_dispatch: # Allows to run workflow manually from GitHub UI
-  pull_request:
-    branches:
-      - master
   push:
     branches:
       - '**'
@@ -59,14 +55,3 @@ jobs:
           name: coverage-results
           path: |
             **/build/reports/jacoco
-
-  qodana:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2022.2.3
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
