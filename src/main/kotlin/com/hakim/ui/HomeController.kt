@@ -4,8 +4,9 @@ import com.hakim.domain.AggregateId
 import com.hakim.domain.event.BookRegistered
 import com.hakim.domain.event.LibraryInitialized
 import com.hakim.domain.service.LibraryReconstruction
-import com.hakim.infrastructure.eventstore.MongoEventStore
 import com.hakim.infrastructure.broker.producer.TestClient
+import com.hakim.infrastructure.eventstore.EventStore
+import com.hakim.infrastructure.eventstore.EventStoreQualifier
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
@@ -15,7 +16,7 @@ import java.util.*
 
 @Controller("/")
 class HomeController(
-    private val eventStore: MongoEventStore,
+    @EventStoreQualifier private val eventStore: EventStore,
     private val json: Json,
     private val libraryReconstruction: LibraryReconstruction,
     private val testClient: TestClient,

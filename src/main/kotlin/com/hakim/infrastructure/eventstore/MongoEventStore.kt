@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import org.litote.kmongo.eq
 
 @Singleton
+@EventStoreQualifier
 class MongoEventStore(
     @Inject private val client: MongoClient,
     @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher
