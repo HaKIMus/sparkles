@@ -9,6 +9,6 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 @Singleton
 class MongoClient(@Value("\${mongodb.uri}") private val connection: String) {
-    val client: CoroutineClient = KMongo.createClient(connection).coroutine
+    private val client: CoroutineClient = KMongo.createClient(connection).coroutine
     val database: CoroutineDatabase = client.getDatabase("sparkles")
 }
