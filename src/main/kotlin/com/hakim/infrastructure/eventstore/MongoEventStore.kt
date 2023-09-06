@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import org.litote.kmongo.eq
 
 @Singleton
@@ -21,22 +20,22 @@ class MongoEventStore(
 ) : EventStore {
     private val collection = client.database.getCollection<DomainEvent>()
 
-    override suspend fun persist(event: DomainEvent) = withContext<Unit>(dispatcher) {
+    override suspend fun persist(event: DomainEvent) {
         collection.insertOne(event)
     }
 
-    override suspend fun persist(events: List<DomainEvent>) = withContext<Unit>(dispatcher) {
+    override suspend fun persist(events: List<DomainEvent>) {
         collection.insertMany(events)
     }
 
-    override suspend fun read(aggregateId: AggregateId): Flow<DomainEvent> = withContext(dispatcher) {
-        return@withContext collection
+    override suspend fun read(aggregateId: AggregateId): Flow<DomainEvent> {
+        return collection
             .find(DomainEvent::aggregateId eq aggregateId)
             .ascendingSort(DomainEvent::occurredOn)
             .toFlow()
     }
 
-    override suspend fun readAll(): Flow<Flow<DomainEvent>> = withContext(dispatcher) {
+    override suspend fun readAll(): Flow<Flow<DomainEvent>> {
         val events = collection
             .find()
             .ascendingSort(DomainEvent::occurredOn)
@@ -44,7 +43,7 @@ class MongoEventStore(
 
         val groupedEvents = events.groupBy { it.aggregateId }
 
-        return@withContext flow {
+        return flow {
             groupedEvents.forEach { (_, events) ->
                 emit(events.asFlow())
             }

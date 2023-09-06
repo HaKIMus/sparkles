@@ -2,11 +2,14 @@ package com.hakim.domain.service
 
 import com.hakim.domain.Library
 import com.hakim.domain.event.*
+import com.hakim.domain.exception.AggregateReconstructionException
+import com.hakim.domain.exception.LibraryNotInitializedException
+import com.hakim.domain.exception.UnsupportedEvent
 import jakarta.inject.Singleton
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @Singleton
 class LibraryReconstruction : AggregateReconstruction<Library> {
@@ -14,7 +17,7 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
         val sortedEvents = events.sortedBy { it.occurredOn }.toMutableList()
 
         if (sortedEvents.first() !is LibraryInitialized) {
-            throw Exception("No init event") // TODO: domain exception
+            throw AggregateReconstructionException("No init event")
         }
 
         val library = createLibraryFromFirstEvent(sortedEvents.first())
@@ -26,31 +29,42 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
         return library
     }
 
-    override suspend fun reconstructAsync(events: Flow<DomainEvent>): Deferred<Library> = coroutineScope {
-        var library: Library? = null
+    /**
+     * @param events It's assumed that the flow contains sorted domain events
+     */
+    override suspend fun reconstruct(events: Flow<DomainEvent>): Library {
+        validateEvents(events)
+        return reconstructLibraryFromEvents(events).getOrElse { throw it }
+    }
+
+    private suspend fun reconstructLibraryFromEvents(events: Flow<DomainEvent>): Result<Library> {
+        var libraryResult: Result<Library> = Result.failure(LibraryNotInitializedException())
 
         events.collect { event ->
-            when (event) {
-                is LibraryInitialized -> {
-                    if (library == null) {
-                        library = createLibraryFromFirstEvent(event)
-                    } else {
-                        throw Exception("Multiple init events") // TODO: domain exception
-                    }
-                }
-                else -> {
-                    if (library != null) {
-                        mapEventToLibrary(library!!, event)
-                    } else {
-                        throw Exception("No init event") // TODO: domain exception
-                    }
-                }
-            }
+            libraryResult = processEvent(libraryResult, event)
         }
 
+        return libraryResult
+    }
 
-        return@coroutineScope async {
-            library ?: throw IllegalStateException("No library was created")
+    private fun processEvent(existingLibrary: Result<Library>, event: DomainEvent): Result<Library> {
+        return if (event is LibraryInitialized) {
+            Result.success(createLibraryFromFirstEvent(event))
+        } else {
+            existingLibrary.fold(
+                onFailure = { Result.failure(LibraryNotInitializedException()) },
+                onSuccess = { mapEventToLibrary(it, event); Result.success(it) }
+            )
+        }
+    }
+
+    private suspend fun validateEvents(events: Flow<DomainEvent>) {
+        require(events.filter { it is LibraryInitialized }.count() == 1) {
+            "There must be exactly one LibraryInitialized event"
+        }
+
+        require(events.first() is LibraryInitialized) {
+            "LibraryInitialized event must be the first event"
         }
     }
 
@@ -66,7 +80,7 @@ class LibraryReconstruction : AggregateReconstruction<Library> {
                 library.apply(event)
             }
             else -> {
-                throw Exception("Unsupported event: ${event::class}")
+                throw UnsupportedEvent("Unsupported event: ${event::class}")
             }
         }
     }

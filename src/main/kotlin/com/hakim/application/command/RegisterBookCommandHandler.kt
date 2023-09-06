@@ -13,7 +13,7 @@ class RegisterBookCommandHandler(
     @EventStoreQualifier private val eventStore: EventStore,
 ) : UnitCommandHandler<RegisterBookCommand> {
     override suspend fun handle(command: RegisterBookCommand) = withContext(Dispatchers.IO) {
-        val library = aggregateReconstruction.reconstructAsync(command.libraryId).await()
+        val library = aggregateReconstruction.reconstruct(command.libraryId)
         library.registerBook(command.book)
         eventStore.persist(library.changes)
     }
