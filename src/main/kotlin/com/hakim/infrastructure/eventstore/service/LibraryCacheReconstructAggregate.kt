@@ -20,7 +20,7 @@ class LibraryCacheReconstructAggregate(
 
     override suspend fun reconstruct(aggregateId: AggregateId): Library {
         return cache.get(aggregateId) {
-            reconstruction.reconstructAsync(eventStore.read(aggregateId)).await()
+            reconstruction.reconstruct(eventStore.read(aggregateId))
         }
     }
 
@@ -31,7 +31,7 @@ class LibraryCacheReconstructAggregate(
             cache.invalidateAll()
 
             eventStore.readAll().collect {
-                val library = reconstruction.reconstructAsync(it).await()
+                val library = reconstruction.reconstruct(it)
                 cache.put(library.id, library)
             }
 

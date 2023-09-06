@@ -1,33 +1,37 @@
+val kotlinVersion = project.properties["kotlinVersion"].toString()
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.21"
-    id("org.jetbrains.kotlin.kapt") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.6.21"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.micronaut.application") version "3.4.1"
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.8.21"
+    kotlin("kapt") version "1.8.21"
+    kotlin("plugin.allopen") version "1.8.21"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.0.0"
+    kotlin("plugin.serialization") version "1.8.21"
     jacoco
 }
 
 version = "0.1"
 group = "com.hakim"
 
-val kotlinVersion = project.properties.get("kotlinVersion")
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+
+    runtimeOnly("org.yaml:snakeyaml")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    kapt("io.micronaut:micronaut-http-validation")
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut.kafka:micronaut-kafka")
     implementation("io.micronaut.kotlin:micronaut-kotlin-extension-functions")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
-    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.validation:micronaut-validation")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
     runtimeOnly("ch.qos.logback:logback-classic")
 
@@ -36,6 +40,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
 
     implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
+    implementation("io.micronaut:micronaut-jackson-databind")
 
     testImplementation("org.testcontainers:kafka:1.18.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
@@ -49,7 +54,8 @@ application {
     mainClass.set("com.hakim.ApplicationKt")
 }
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.test {
@@ -58,23 +64,11 @@ tasks.test {
 
 tasks.withType<JacocoReport> {
     reports {
-        xml.isEnabled = true
-        html.isEnabled = true
+        xml.required.set(true)
+        html.required.set(true)
     }
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-    }
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-    }
-}
 graalvmNative.toolchainDetection.set(false)
 micronaut {
     runtime("netty")
@@ -84,6 +78,3 @@ micronaut {
         annotations("com.hakim.*")
     }
 }
-
-
-

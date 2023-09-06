@@ -32,6 +32,6 @@ class HomeController(
 
         testClient.send("test", "key", "$bookId")
 
-        return json.encodeToString(libraryReconstruction.reconstructAsync(eventStore.read(aggregateId)).await())
+        return json.encodeToString(libraryReconstruction.reconstruct(eventStore.read(aggregateId)))
     }
 }
