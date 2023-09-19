@@ -8,7 +8,6 @@ import io.micronaut.configuration.kafka.annotation.KafkaListener
 import io.micronaut.configuration.kafka.annotation.OffsetReset
 import io.micronaut.configuration.kafka.annotation.Topic
 import jakarta.inject.Inject
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory.getLogger
 
 @KafkaListener(offsetReset = OffsetReset.EARLIEST)
@@ -17,7 +16,7 @@ class InitializeLibraryListener @Inject constructor(
 ) {
     private val logger = getLogger(InitializeLibraryListener::class.java)
     @Topic("initialize-library")
-    fun receive(library: LibraryInitializedMessage) = runBlocking {
+    suspend fun receive(library: LibraryInitializedMessage) {
         logger.info("Received message to initialize library with id: ${library.aggregateId}")
 
         handler.handle(InitializeLibraryBookCommand(AggregateId.fromString(library.aggregateId)))

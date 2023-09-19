@@ -42,7 +42,7 @@ services:
   sparkles-app:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     depends_on:
       - kafka
       - mongodb

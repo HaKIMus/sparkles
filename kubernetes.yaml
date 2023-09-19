@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparkles-app-service
+spec:
+  selector:
+    app: sparkles-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparkles-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sparkles-app
+  template:
+    metadata:
+      labels:
+        app: sparkles-app
+    spec:
+      containers:
+        - name: sparkles-app
+          image: hakimwastaken/sparkles-app:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparkles-app-loadbalancer-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: sparkles-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
